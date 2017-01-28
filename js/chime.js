@@ -107,9 +107,9 @@ function Chime(x_pos,y_pos,width,height){
     fill('#541E21');
     vertex (5, (this.h + 30)/2);
     bezierVertex(15,
-                 (this.h + 30)/2 - 40,
+                 (this.h + 30)/2 - this.w/2,
                  this.w -15,
-                 (this.h + 30)/2 - 40,
+                 (this.h + 30)/2 - this.w/2,
                  this.w - 5,
                  (this.h + 30)/2);
     vertex (this.w - 5, this.h);
