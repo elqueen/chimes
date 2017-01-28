@@ -74,6 +74,7 @@ function draw() {
   // Draw Hanger
   drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
   if(showModel){
+    //Draw Physics Model
     var bodies = Composite.allBodies(engine.world);
     var constraints = Composite.allConstraints(engine.world);
 
@@ -98,6 +99,11 @@ function draw() {
         endShape(CLOSE);
         pop();
     }
+  }
+
+  // Draw Pretty Chimes by @elqueen
+  for (i = 0; i< chimes.length ;i++){
+    chimes[i].show();
   }
 }
 
