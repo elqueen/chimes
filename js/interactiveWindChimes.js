@@ -17,7 +17,7 @@ var windSlider;
 var worldBodies = [];
 
 // Chime Characteristics
-var numberofChimes = 6;
+var numberofChimes = 8;
 var chimeWidth = 80;
 var spaceAroundChime = chimeWidth + 70;
 var largestChimeHeight = 500;
@@ -27,7 +27,8 @@ var chimeHangerThickness= 30;
 
 //For kicks
 var showSlider = true;
-var showModel = true;
+var showModel = false;
+var showVisuals = true;
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // Use the full browser window
@@ -71,39 +72,18 @@ function draw() {
   windy();
   Engine.update(engine, 1000 / 60);
 
-  // Draw Hanger
-  drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
   if(showModel){
-    //Draw Physics Model
-    var bodies = Composite.allBodies(engine.world);
-    var constraints = Composite.allConstraints(engine.world);
-
-    for (var i = 0; i < constraints.length; i++) {
-        var constraint = constraints[i];
-        push();
-        beginShape();
-        vertex(constraint.pointA.x, constraint.pointA.y);
-        vertex(constraint.bodyB.position.x + constraint.pointB.x, constraint.bodyB.position.y +constraint.pointB.y);
-        endShape(CLOSE);
-        pop();
-    }
-
-    for (var i = 0; i < bodies.length; i++) {
-        var vertices = bodies[i].vertices;
-        push();
-        fill('rgba(255,255,255,.5)')
-        beginShape();
-        for (var j = 0; j < vertices.length; j++) {
-            vertex(vertices[j].x, vertices[j].y);
-        }
-        endShape(CLOSE);
-        pop();
-    }
+    drawModel()
   }
 
-  // Draw Pretty Chimes by @elqueen
-  for (i = 0; i< chimes.length ;i++){
-    chimes[i].show();
+  if(showVisuals){
+    // Draw Hanger
+    drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
+
+    // Draw Pretty Chimes by @elqueen
+    for (i = 0; i< chimes.length ;i++){
+      chimes[i].show();
+    }
   }
 }
 
@@ -132,5 +112,36 @@ function keyPressed() {
     showSlider ? windSlider.show() : windSlider.hide();
   }else if (keyCode == 77){
     showModel = !showModel;
+  }else if (keyCode == 86){
+    showModel = showVisuals;
+    showVisuals = !showVisuals;
+  }
+}
+
+function drawModel() {
+  //Draw Physics Model
+  var bodies = Composite.allBodies(engine.world);
+  var constraints = Composite.allConstraints(engine.world);
+
+  for (var i = 0; i < constraints.length; i++) {
+      var constraint = constraints[i];
+      push();
+      beginShape();
+      vertex(constraint.pointA.x, constraint.pointA.y);
+      vertex(constraint.bodyB.position.x + constraint.pointB.x, constraint.bodyB.position.y +constraint.pointB.y);
+      endShape(CLOSE);
+      pop();
+  }
+
+  for (var i = 0; i < bodies.length; i++) {
+      var vertices = bodies[i].vertices;
+      push();
+      fill('rgba(255,255,255,.5)')
+      beginShape();
+      for (var j = 0; j < vertices.length; j++) {
+          vertex(vertices[j].x, vertices[j].y);
+      }
+      endShape(CLOSE);
+      pop();
   }
 }
