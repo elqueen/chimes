@@ -29,6 +29,7 @@ var chimeHangerThickness= 30;
 var showSlider = true;
 var showModel = false;
 var showVisuals = true;
+var showSound = true;
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // Use the full browser window
@@ -72,10 +73,6 @@ function draw() {
   windy();
   Engine.update(engine, 1000 / 60);
 
-  if(showModel){
-    drawModel()
-  }
-
   if(showVisuals){
     // Draw Hanger
     drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
@@ -83,7 +80,12 @@ function draw() {
     // Draw Pretty Chimes by @elqueen
     for (i = 0; i< chimes.length ;i++){
       chimes[i].show();
+      chimes[i].soundwave(showSound);
     }
+  }
+
+  if(showModel){
+    drawModel()
   }
 }
 
@@ -115,6 +117,10 @@ function keyPressed() {
   }else if (keyCode == 86){
     showModel = showVisuals;
     showVisuals = !showVisuals;
+  }else if (keyCode == 32){
+    if(showVisuals){
+      showSound = !showSound;
+    }
   }
 }
 
