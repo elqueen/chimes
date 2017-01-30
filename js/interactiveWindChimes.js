@@ -7,11 +7,12 @@ var Engine = Matter.Engine,
     World = Matter.World,
     Bodies = Matter.Bodies,
     Body = Matter.Body,
+    Events = Matter.Events,
     Constraint = Matter.Constraint,
     Composite = Matter.Composite;
 
 var engine;
-var chimes = [];
+var chimes = {};
 var pendulums = [];
 var chimeModels = [];
 var pendulumModels = [];
@@ -39,6 +40,8 @@ function setup() {
 
   // Create Physics Enginer
   engine = Engine.create();
+  Events.on(engine, "collisionStart", startSound);
+  Events.on(engine, "collisionEnd", endSound);
 
   var startingX = (windowWidth - (numberofChimes * spaceAroundChime))/2 - spaceAroundChime/2;
 
@@ -58,7 +61,7 @@ function setup() {
                               chimeHangerY+chimeHangerThickness,
                               chimeWidth,
                               largestChimeHeight - (reduceChimeHeight*i));
-        chimes.push(chime);
+        chimes[chime.chime.id] = chime;
         chimeModels.push(chime.chimeModel);
       }
   }
@@ -98,10 +101,11 @@ function draw() {
     drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
 
     // Draw Pretty Chimes by @elqueen
-    for (i = 0; i< chimes.length ;i++){
-      chimes[i].show();
-      chimes[i].soundwave(showSound);
-    }
+    Object.keys(chimes).forEach(function(key){
+      chimes[key].show();
+    });
+
+
     for (i = 0; i< pendulums.length ;i++){
       pendulums[i].show();
     }
@@ -127,16 +131,16 @@ function windy(){
   // (windSlider.value())/10000
   var windForce = (noise(1,frameCount))/500;
 
-  for (i = 0; i< chimes.length ;i++){
-    Body.applyForce(chimes[i].chime,
+  Object.keys(chimes).forEach(function(key){
+    Body.applyForce(chimes[key].chime,
                     {x:0,y:windowHeight-300},
-                    {x:windForce*10/(i+1),y:0});
-  }
+                    {x:windForce*25/(i+1),y:0});
+  });
 
   for (i = 0; i< pendulums.length ;i++){
     Body.applyForce(pendulums[i].pendulum,
                     {x:0,y:windowHeight-300},
-                    {x:windForce,y:0});
+                    {x:(windForce),y:0});
   }
 }
 
@@ -201,5 +205,31 @@ function drawModel() {
       }
       endShape(CLOSE);
       pop();
+  }
+}
+
+function startSound(event){
+  if(showSound){
+    var pairs = event.pairs;
+    for (var i = 0; i < pairs.length; i++) {
+      var pair = pairs[i];
+      if(chimes[pair.bodyA.id]){
+        chimes[pair.bodyA.id].sound = true;
+      }else if(chimes[pair.bodyB.id]){
+        chimes[pair.bodyB.id].sound = true;
+      }
+    }
+  }
+}
+
+function endSound(event){
+  var pairs = event.pairs;
+  for (var i = 0; i < pairs.length; i++) {
+    var pair = pairs[i];
+    if(chimes[pair.bodyA.id]){
+      chimes[pair.bodyA.id].sound = true;
+    }else if(chimes[pair.bodyB.id]){
+      chimes[pair.bodyB.id].sound = true;
+    }
   }
 }
