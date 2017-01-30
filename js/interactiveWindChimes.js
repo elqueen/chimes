@@ -42,7 +42,7 @@ function setup() {
   // Create Chimes
   for (i = 0; i< numberofChimes ;i++){
       var chime = new Chime(startingX + (spaceAroundChime*i),
-                            chimeHangerY,
+                            chimeHangerY+chimeHangerThickness,
                             chimeWidth,
                             largestChimeHeight - (reduceChimeHeight*i));
       chimes.push(chime);
@@ -101,8 +101,8 @@ function windy(){
   // Add wind force to every chime decreasing strength
   for (i = 0; i< chimes.length ;i++){
     Body.applyForce(chimes[i].chime,
-                    {x:100,y:500},
-                    {x:(windSlider.value()/1000)/(i+1),y:0});
+                    {x:0,y:windowHeight-300},
+                    {x:((windSlider.value())/1000)/(i+1),y:0});
   }
 }
 
