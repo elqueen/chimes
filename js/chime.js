@@ -55,6 +55,25 @@ function Chime(x_pos,y_pos,width,height){
          this.constraintLeft.bodyB.position.y + this.constraintLeft.pointB.y,
          this.constraintRight.bodyB.position.x + this.constraintRight.pointB.x,
          this.constraintRight.bodyB.position.y + this.constraintRight.pointB.y);
+
+    //Draw Straps
+    var numberofWraps = 4;
+    var wrapSpacing = 5;
+
+    for(var i = 0; i < numberofWraps; i++){
+      line(this.constraintLeft.pointA.x - wrapSpacing*i,
+           this.constraintLeft.pointA.y,
+           this.constraintLeft.pointA.x - wrapSpacing*i ,
+           this.constraintLeft.pointA.y - chimeHangerThickness);
+    }
+
+    for(var i = 0; i < numberofWraps; i++){
+      line(this.constraintRight.pointA.x + wrapSpacing*i,
+           this.constraintRight.pointA.y,
+           this.constraintRight.pointA.x + wrapSpacing*i,
+           this.constraintRight.pointA.y - chimeHangerThickness);
+    }
+
     pop();
   }
 
@@ -127,7 +146,7 @@ function Chime(x_pos,y_pos,width,height){
     push();
     translate (this.chime.position.x,this.chime.position.y);
     rotate(this.chime.angle);
-    if(on && floor(random(100))%9 == 0 && soundParticles.length<100){
+    if(on && floor(random(100))%9 == 0 && soundParticles.length<25){
       soundParticles.push(new SoundParticle(this.chimeHue));
     }
     for(var i = 0; i < soundParticles.length; i++){
