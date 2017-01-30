@@ -28,7 +28,8 @@ var chimeHangerY = 50;
 var chimeHangerThickness= 30;
 
 //For kicks
-var showSlider = true;
+/*var showSlider = true; NOTE: For Testing*/
+var startWind = true;
 var showModel = false;
 var showVisuals = true;
 var showSound = true;
@@ -74,17 +75,22 @@ function setup() {
   // Add all of the Chimes to the world
   World.add(engine.world, worldBodies);
 
+  /* NOTE: For Testing Value Radomized in windy() for submission
   // Control Wind for now using Slider
   windSlider = createSlider(0, 200, 0);
   windSlider.position(windowWidth - 100, windowHeight-30);
-  windSlider.style('width', '80px');
+  windSlider.style('width', '80px');*/
+
 }
 
 function draw() {
   clear();
 
   // Blow Wind
-  windy();
+  if(startWind){
+    windy();
+  }
+
   Engine.update(engine, 1000 / 60);
 
   if(showVisuals){
@@ -116,16 +122,21 @@ function drawChimeHanger(x,y,w,h) {
 
 function windy(){
   // Add wind force to every chime decreasing strength
+
+  // NOTE:TEMPORARY This will be dictated by user input in the future
+  // (windSlider.value())/10000
+  var windForce = (noise(1,frameCount))/500;
+
   for (i = 0; i< chimes.length ;i++){
     Body.applyForce(chimes[i].chime,
                     {x:0,y:windowHeight-300},
-                    {x:((windSlider.value())/1000)/(i+1),y:0});
+                    {x:windForce*10/(i+1),y:0});
   }
 
   for (i = 0; i< pendulums.length ;i++){
     Body.applyForce(pendulums[i].pendulum,
                     {x:0,y:windowHeight-300},
-                    {x:((windSlider.value())/10000)/(i+1),y:0});
+                    {x:windForce,y:0});
   }
 }
 
@@ -133,8 +144,11 @@ function windy(){
 
 function keyPressed() {
   if (keyCode == 87) {
+    startWind = !startWind;
+
+    /* NOTE: For Testing
     showSlider = !showSlider;
-    showSlider ? windSlider.show() : windSlider.hide();
+    showSlider ? windSlider.show() : windSlider.hide();*/
   }else if (keyCode == 77){
     showModel = !showModel;
   }else if (keyCode == 86){
