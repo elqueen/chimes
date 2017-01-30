@@ -45,7 +45,7 @@ function setup() {
   for (i = 0; i< numberofChimes ;i++){
       if(i%2 != 0){
         startingX += ((spaceAroundChime))
-        var pendulum = new pendulum(startingX,
+        var pendulum = new Pendulum(startingX,
                               chimeHangerY,
                               chimeWidth,
                               largestChimeHeight*1.5 - (reduceChimeHeight*i));
