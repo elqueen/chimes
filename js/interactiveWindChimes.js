@@ -14,6 +14,7 @@ var Engine = Matter.Engine,
 var engine;
 var chimes = {};
 var pendulums = [];
+var clouds = [];
 var chimeModels = [];
 var pendulumModels = [];
 var windSlider;
@@ -78,6 +79,14 @@ function setup() {
   // Add all of the Chimes to the world
   World.add(engine.world, worldBodies);
 
+  // Add Clouds
+  var startNumClouds = 10;
+  for(var i = 0; i< startNumClouds; i++){
+    c = new Cloud(random (0, windowHeight));
+    c.x = random(0, windowWidth);
+    clouds.push(c);
+  }
+
   /* NOTE: For Testing Value Radomized in windy() for submission
   // Control Wind for now using Slider
   windSlider = createSlider(0, 200, 0);
@@ -97,6 +106,21 @@ function draw() {
   Engine.update(engine, 1000 / 60);
 
   if(showVisuals){
+    // Draw Clouds
+    for (var i = 0; i< clouds.length ;i++){
+      clouds[i].show();
+      clouds[i].move();
+      if(clouds[i].shouldDie()){
+        clouds.splice(i,1);
+      }
+    }
+
+    // Add a Cloud?
+    if(floor(frameCount%100) == 0 && clouds.length < 15){
+      c = new Cloud(random (0, windowHeight));
+      clouds.push(c);
+    }
+
     // Draw Hanger
     drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
 
@@ -134,13 +158,13 @@ function windy(){
   Object.keys(chimes).forEach(function(key){
     Body.applyForce(chimes[key].chime,
                     {x:0,y:windowHeight-300},
-                    {x:windForce*25/(i+1),y:0});
+                    {x:windForce,y:0});
   });
 
   for (i = 0; i< pendulums.length ;i++){
     Body.applyForce(pendulums[i].pendulum,
                     {x:0,y:windowHeight-300},
-                    {x:(windForce),y:0});
+                    {x:windForce,y:0});
   }
 }
 
