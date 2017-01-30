@@ -9,6 +9,7 @@ function Chime(x_pos,y_pos,width,height){
   this.pos = createVector(this.constraintPos.x,
                           this.constraintPos.y + this.h/2 + this.constraintLen-10);
   this.chimeHue = floor(random(0,360));
+  this.sound = false;
 
   this.chimeModel = Composite.create();
 
@@ -34,6 +35,7 @@ function Chime(x_pos,y_pos,width,height){
   this.show = function(){
       this.showChimeBody();
       this.showChimeStrings();
+      this.soundwave();
   }
 
   this.showChimeStrings = function() {
@@ -141,13 +143,16 @@ function Chime(x_pos,y_pos,width,height){
   }
 
   var soundParticles = [];
-
-  this.soundwave = function(on){
+  
+  this.soundwave = function(){
     push();
     translate (this.chime.position.x,this.chime.position.y);
     rotate(this.chime.angle);
-    if(on && floor(random(100))%9 == 0 && soundParticles.length<25){
-      soundParticles.push(new SoundParticle(this.chimeHue));
+    if(this.sound && soundParticles.length<25){
+      var numberofParticles = floor(random(1,5));
+      for(var i = 0; i<numberofParticles;i++){
+        soundParticles.push(new SoundParticle(this.chimeHue));
+      }
     }
     for(var i = 0; i < soundParticles.length; i++){
       soundParticles[i].show();
