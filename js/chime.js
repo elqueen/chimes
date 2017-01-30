@@ -95,8 +95,8 @@ function Chime(x_pos,y_pos,width,height){
     vertex (this.w + 10, 0);
     vertex (this.w, 10);
     vertex (this.w, this.h);
-    vertex ((this.w - this.w/2)+5, this.h + 30);
-    vertex ((this.w/2)-5, this.h + 30);
+    vertex ((this.w -(this.w/4)) , this.h + this.w/4);
+    vertex (this.w/4, this.h + this.w/4);
     vertex (0, this.h);
     vertex (0, 20);
     vertex (0, 10);
@@ -132,8 +132,8 @@ function Chime(x_pos,y_pos,width,height){
                  this.w - 5,
                  (this.h + 30)/2);
     vertex (this.w - 5, this.h);
-    vertex ((this.w - this.w/2) + 2, this.h + 30);
-    vertex ((this.w/2) - 2, this.h + 30);
+    vertex ((this.w -(this.w/4)) - 2, this.h + this.w/4);
+    vertex ((this.w/4)+2, this.h + this.w/4);
     vertex (5, this.h);
     stroke('#AA5719');
     strokeWeight(5);
@@ -143,7 +143,7 @@ function Chime(x_pos,y_pos,width,height){
   }
 
   var soundParticles = [];
-  
+
   this.soundwave = function(){
     push();
     translate (this.chime.position.x,this.chime.position.y);
