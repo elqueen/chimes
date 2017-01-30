@@ -227,9 +227,9 @@ function endSound(event){
   for (var i = 0; i < pairs.length; i++) {
     var pair = pairs[i];
     if(chimes[pair.bodyA.id]){
-      chimes[pair.bodyA.id].sound = true;
+      chimes[pair.bodyA.id].sound = false;
     }else if(chimes[pair.bodyB.id]){
-      chimes[pair.bodyB.id].sound = true;
+      chimes[pair.bodyB.id].sound = false;
     }
   }
 }
