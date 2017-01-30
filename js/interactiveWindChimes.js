@@ -12,14 +12,16 @@ var Engine = Matter.Engine,
 
 var engine;
 var chimes = [];
+var pendulums = [];
 var chimeModels = [];
+var pendulumModels = [];
 var windSlider;
 var worldBodies = [];
 
 // Chime Characteristics
-var numberofChimes = 8;
+var numberofChimes = 9; // Best if Odd number
 var chimeWidth = 80;
-var spaceAroundChime = chimeWidth + 70;
+var spaceAroundChime = chimeWidth + 25;
 var largestChimeHeight = 500;
 var reduceChimeHeight = 25;
 var chimeHangerY = 50;
@@ -37,16 +39,27 @@ function setup() {
   // Create Physics Enginer
   engine = Engine.create();
 
-  var startingX = (windowWidth - (numberofChimes - 1) * spaceAroundChime)/2;
+  var startingX = (windowWidth - (numberofChimes * spaceAroundChime))/2 - spaceAroundChime/2;
 
   // Create Chimes
   for (i = 0; i< numberofChimes ;i++){
-      var chime = new Chime(startingX + (spaceAroundChime*i),
-                            chimeHangerY+chimeHangerThickness,
-                            chimeWidth,
-                            largestChimeHeight - (reduceChimeHeight*i));
-      chimes.push(chime);
-      chimeModels.push(chime.chimeModel);
+      if(i%2 != 0){
+        startingX += ((spaceAroundChime))
+        var pendulum = new pendulum(startingX,
+                              chimeHangerY,
+                              chimeWidth,
+                              largestChimeHeight*1.5 - (reduceChimeHeight*i));
+        pendulums.push(pendulum);
+        pendulumModels.push(pendulum.pendulumModel);
+      }else{
+        startingX += ((spaceAroundChime))
+        var chime = new Chime(startingX,
+                              chimeHangerY+chimeHangerThickness,
+                              chimeWidth,
+                              largestChimeHeight - (reduceChimeHeight*i));
+        chimes.push(chime);
+        chimeModels.push(chime.chimeModel);
+      }
   }
 
   var chimeHanger = Bodies.rectangle(windowWidth/2,
@@ -56,6 +69,7 @@ function setup() {
                                      {isStatic: true});
 
   worldBodies = worldBodies.concat(chimeModels);
+  worldBodies = worldBodies.concat(pendulumModels);
   worldBodies.push(chimeHanger);
   // Add all of the Chimes to the world
   World.add(engine.world, worldBodies);
@@ -82,6 +96,9 @@ function draw() {
       chimes[i].show();
       chimes[i].soundwave(showSound);
     }
+    for (i = 0; i< pendulums.length ;i++){
+      pendulums[i].show();
+    }
   }
 
   if(showModel){
@@ -103,6 +120,12 @@ function windy(){
     Body.applyForce(chimes[i].chime,
                     {x:0,y:windowHeight-300},
                     {x:((windSlider.value())/1000)/(i+1),y:0});
+  }
+
+  for (i = 0; i< pendulums.length ;i++){
+    Body.applyForce(pendulums[i].pendulum,
+                    {x:0,y:windowHeight-300},
+                    {x:((windSlider.value())/10000)/(i+1),y:0});
   }
 }
 
@@ -131,10 +154,25 @@ function drawModel() {
 
   for (var i = 0; i < constraints.length; i++) {
       var constraint = constraints[i];
+
+      var x1 = 0;
+      var y1 = 0;
+      constraint.bodyA ? x1 += constraint.bodyA.position.x : x1 += 0;
+      constraint.bodyA ? y1 += constraint.bodyA.position.y : y1 += 0;
+      constraint.pointA ? x1 += constraint.pointA.x : x1 += 0 ;
+      constraint.pointA ? y1 += constraint.pointA.y : y1 += 0;
+
+      var x2 = 0;
+      var y2 = 0;
+      constraint.bodyB ? x2 += constraint.bodyB.position.x : x2 += 0;
+      constraint.bodyB ? y2 += constraint.bodyB.position.y : y2 += 0;
+      constraint.pointB ? x2 += constraint.pointB.x : x2 += 0;
+      constraint.pointB ? y2 += constraint.pointB.y : y2 += 0;
+
       push();
       beginShape();
-      vertex(constraint.pointA.x, constraint.pointA.y);
-      vertex(constraint.bodyB.position.x + constraint.pointB.x, constraint.bodyB.position.y +constraint.pointB.y);
+      vertex(x1, y1);
+      vertex(x2, y2);
       endShape(CLOSE);
       pop();
   }
