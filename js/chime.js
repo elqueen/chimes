@@ -8,11 +8,9 @@ function Chime(x_pos,y_pos,width,height){
   this.h = height;
   this.pos = createVector(this.constraintPos.x,
                           this.constraintPos.y + this.h/2 + this.constraintLen-10);
+  this.chimeHue = floor(random(0,360));
 
-  this.constraintLeft;
-  this.constraintRight;
-  this.chime;
-  this.chimeModel;
+  this.chimeModel = Composite.create();
 
   this.chime = Bodies.rectangle(this.pos.x, this.pos.y, this.w, this.h);
 
@@ -123,5 +121,57 @@ function Chime(x_pos,y_pos,width,height){
     pop();
   }
 
+  var soundParticles = [];
+
+  this.soundwave = function(on){
+    push();
+    translate (this.chime.position.x,this.chime.position.y);
+    rotate(this.chime.angle);
+    if(on && floor(random(100))%9 == 0 && soundParticles.length<100){
+      soundParticles.push(new SoundParticle(this.chimeHue));
+    }
+    for(var i = 0; i < soundParticles.length; i++){
+      soundParticles[i].show();
+      soundParticles[i].update();
+      if(soundParticles[i].shouldDie()){
+        soundParticles.splice(i,1);
+      }
+    }
+    pop();
+  }
+
+  function SoundParticle(h){
+
+      this.pos= createVector(random(-20,20),0);
+      this.diameter = random(5,10);
+      this.dy = random(1,3);
+      this.life = 400;
+      this.hue = h;
+
+      this.show = function(){
+        push();
+        colorMode(HSB);
+        fill(this.hue,100,75,this.parabolicopacitiy(this.pos.y/this.life));
+        noStroke();
+        var x = this.pos.x+sin(this.pos.y/40)*10;
+        var y = this.pos.y;
+        ellipse(x,y, this.diameter, this.diameter);
+        pop();
+      }
+
+      this.parabolicopacitiy = function(x){
+        //increase to half-lifetime,decrease to death
+        return 4*x-4*pow(x,2);
+      }
+
+      this.update = function(){
+        this.pos.y += this.dy;
+      }
+
+      this.shouldDie = function(){
+        return this.pos.y > this.life;
+      }
+
+  }
 
 }
