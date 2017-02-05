@@ -9,7 +9,9 @@ var Engine = Matter.Engine,
     Body = Matter.Body,
     Events = Matter.Events,
     Constraint = Matter.Constraint,
-    Composite = Matter.Composite;
+    Composite = Matter.Composite,
+    MouseConstraint = Matter.MouseConstraint,
+    Mouse = Matter.Mouse;
 
 var engine;
 var chimes = {};
@@ -27,7 +29,7 @@ var X_AXIS = 2;
 var numberofChimes = 9; // Best if Odd number
 var chimeWidth = 80;
 var spaceAroundChime = chimeWidth + 25;
-var largestChimeHeight = 500;
+var largestChimeHeight;
 var reduceChimeHeight = 25;
 var chimeHangerY = 50;
 var chimeHangerThickness= 30;
@@ -42,6 +44,8 @@ var startWind = true;
 var showModel = false;
 var showVisuals = true;
 var showSound = true;
+var mouse;
+var mouseConstraint;
 
 function preload() {
   imgDeco = loadImage('assets/RoundChimePendant-04.png');
@@ -63,10 +67,27 @@ function setup() {
   engine = Engine.create();
   Events.on(engine, "collisionStart", startSound);
   Events.on(engine, "collisionEnd", endSound);
+
+  // Add Mouse Controls
+  mouse = Mouse.create();
+  mouseConstraint = MouseConstraint.create(engine, {
+          mouse: mouse,
+          constraint: {
+              stiffness: 0.2,
+              render: {
+                    visible: false
+                }
+          }
+      });
+
+  Events.on(mouseConstraint, 'startdrag', mouseDown);
+  Events.on(mouseConstraint, 'enddrag', mouseUp);
+
   var nextSound = 0;
   var startingX = (windowWidth - (numberofChimes * spaceAroundChime))/2 - spaceAroundChime/2;
 
   // Create Chimes
+  largestChimeHeight = floor(windowHeight*.66);
   for (i = 0; i< numberofChimes ;i++){
       if(i%2 != 0){
         startingX += ((spaceAroundChime))
@@ -100,6 +121,7 @@ function setup() {
   worldBodies.push(chimeHanger);
   // Add all of the Chimes to the world
   World.add(engine.world, worldBodies);
+  World.add(engine.world, MouseConstraint);
 
   // Add Clouds
   var startNumClouds = 10;
@@ -132,7 +154,30 @@ function draw() {
 
   if(showVisuals){
     // Draw Clouds
-    for (var i = 0; i< clouds.length ;i++){
+
+    /* NOTE: We learned something! There was an issue where clouds were flickering.
+       Since we are splicing elements and looping, once we have removed the element
+       we would skip an element in the array and that element wouldn't be drawn.
+       After really thinking about what splice() does and doing some research
+       (https://vimeo.com/141919523), I followed the recommendation of iterating
+       through the loop backwards. When an element is removed, its okay, we just
+       move on towards the start of the array we are headed that way already.
+
+       Iterating Forward:
+
+                              splice(1,1)    Ooops! [C] Not Drawn!
+               [A][B][C][D]   [A][B][C][D]       [A][C][D]
+           i =  0                 1                     2
+
+        Iterating Backwards (start at length - 1):
+
+                              splice(2,1)    No Skip! No Flicker!
+              [A][B][C][D]   [A][B][C][D]       [A][B][D]
+          i =           3           2               1
+
+    */
+
+    for(var i = clouds.length-1; i >=0; i--){
       clouds[i].show();
       clouds[i].move();
       if(clouds[i].shouldDie()){
@@ -176,7 +221,6 @@ function drawChimeHanger(x,y,w,h) {
 function windy(){
   // Add wind force to every chime decreasing strength
 
-  // NOTE:TEMPORARY This will be dictated by user input in the future
   var scale = (windSlider.value())/10000;
 
   var windForce = mic.getLevel()/windSlider.value();
@@ -240,10 +284,7 @@ function drawModel() {
       constraint.pointB ? y2 += constraint.pointB.y : y2 += 0;
 
       push();
-      beginShape();
-      vertex(x1, y1);
-      vertex(x2, y2);
-      endShape(CLOSE);
+      line(x1, y1,x2, y2);
       pop();
   }
 
@@ -265,13 +306,24 @@ function startSound(event){
     var pairs = event.pairs;
     for (var i = 0; i < pairs.length; i++) {
       var pair = pairs[i];
-      if(chimes[pair.bodyA.id]){
-        chimes[pair.bodyA.id].sound = true;
-        chimes[pair.bodyA.id].chimeSound.play();
-      }else if(chimes[pair.bodyB.id]){
-        chimes[pair.bodyB.id].sound = true;
-        chimes[pair.bodyB.id].chimeSound.play();
-      }
+
+      var bodyAVelocity = createVector(pair.bodyA.velocity.x,pair.bodyA.velocity.y);
+      var bodyBVelocity = createVector(pair.bodyB.velocity.x,pair.bodyB.velocity.y);
+      var bodyAMomentum = bodyAVelocity.mult(pair.bodyA.mass);
+      var bodyBMomentum = bodyBVelocity.mult(pair.bodyB.mass);
+      var relativeMomentum = p5.Vector.sub(bodyAMomentum,bodyBMomentum);
+
+      var threshold = max(pair.bodyA.mass,pair.bodyB.mass)/10;
+
+      if(relativeMomentum.mag() > threshold){
+        if(chimes[pair.bodyA.id]){
+          chimes[pair.bodyA.id].sound = true;
+          chimes[pair.bodyA.id].chimeSound.play();
+        }else if(chimes[pair.bodyB.id]){
+          chimes[pair.bodyB.id].sound = true;
+          chimes[pair.bodyB.id].chimeSound.play();
+        }
+     }
     }
   }
 }
@@ -288,17 +340,22 @@ function endSound(event){
   }
 }
 
-// function mouseClicked() {
-//   for (var i = 0; i < pairs.length; i++) {
-//     if(chimes[pair.bodyA.id]){
-//       chimes[pair.bodyA.id].sound = true;
-//       chimes[pair.bodyA.id].chimeSound.play();
-//     }else if(chimes[pair.bodyB.id]){
-//       chimes[pair.bodyB.id].sound = true;
-//       chimes[pair.bodyB.id].chimeSound.play();
-//     }
-//   }
-// }
+function mouseDown(event) {
+  var id = event.body.id;
+  var body = chimes[id];
+  if(body){
+    body.sound = true;
+    body.chimeSound.play();
+  }
+}
+
+function mouseUp(event) {
+  var id = event.body.id;
+  var body = chimes[id];
+  if(body){
+    body.sound = false;
+  }
+}
 
 function setGradient(x, y, w, h, c1, c2, axis) {
   noFill();
@@ -311,13 +368,16 @@ function setGradient(x, y, w, h, c1, c2, axis) {
       stroke(c);
       line(x, i, x+w, i);
     }
-  }  
-  else if (axis == X_AXIS) {  // Left to right gradient
+  }else if (axis == X_AXIS) {  // Left to right gradient
     for (var i = x; i <= x+w; i++) {
       var inter = map(i, x, x+w, 0, 1);
       var c = lerpColor(c1, c2, inter);
       stroke(c);
-      strokeWeight(3);
+      if(inter == 1 || inter == 0 ){
+        strokeWeight(2);
+      }else{
+        strokeWeight(3);
+      }
       line(i, y, i, y+h);
     }
   }
