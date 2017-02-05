@@ -87,7 +87,7 @@ function Chime(x_pos,y_pos,width,height,pitch){
     translate (-this.w/2,-this.h/2); //LeftCorner of Chime
 
     noStroke();
-    
+
     //basic chime body - top
     beginShape();
     setGradient(0, 0, this.w/2, this.h, this.b1, this.b2, X_AXIS);
@@ -97,16 +97,22 @@ function Chime(x_pos,y_pos,width,height,pitch){
     vertex (this.w, this.h);
     vertex (0, this.h);
     endShape(CLOSE);
-    
+
     // basic chime body - bottom
+    push();
     beginShape();
     fill('#AF653B');
-    vertex (0, this.h+2);
-    vertex (this.w, this.h+2);
+    stroke('#AF653B');
+    strokeJoin(ROUND);
+    strokeWeight(3);
+    strokeCap(ROUND);
+    vertex (this.w, this.h);
     vertex ((this.w -(this.w/4)) , this.h + this.w/4);
     vertex (this.w/4, this.h + this.w/4);
+    vertex (0, this.h);
     endShape(CLOSE);
-    
+    pop();
+
     //chime top lip
     beginShape();
     setGradient(-10, -30, this.w/2 +10, 30, this.b1, this.b2, X_AXIS);
@@ -116,7 +122,7 @@ function Chime(x_pos,y_pos,width,height,pitch){
     vertex (this.w + 10, 0);
     vertex (-10, 0);
     endShape(CLOSE);
-    
+
     //chime lip shadow
     beginShape();
     fill("#703910");
@@ -125,7 +131,7 @@ function Chime(x_pos,y_pos,width,height,pitch){
     vertex (this.w , 10);
     vertex (0, 10);
     endShape(CLOSE);
-    
+
     // chime opening
     beginShape();
     fill('#541E21');
@@ -159,7 +165,10 @@ function Chime(x_pos,y_pos,width,height,pitch){
         soundParticles.push(new SoundParticle(this.chimeHue));
       }
     }
-    for(var i = 0; i < soundParticles.length; i++){
+
+    /* NOTE: See Comment on interactiveWindChime.js Line 157 similar issue. */
+
+    for(var i = soundParticles.length-1; i >=0; i--){
       soundParticles[i].show();
       soundParticles[i].update();
       if(soundParticles[i].shouldDie()){
@@ -190,7 +199,7 @@ function Chime(x_pos,y_pos,width,height,pitch){
 
       this.parabolicopacitiy = function(x){
         //increase to half-lifetime,decrease to death
-        return 4*x-4*pow(x,2);
+        return 4*x-4*x*x;
       }
 
       this.update = function(){
