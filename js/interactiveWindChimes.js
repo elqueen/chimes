@@ -41,11 +41,17 @@ var chimeSound = [];
 /*var showSlider = true; NOTE: For Testing*/
 var mic;
 var startWind = true;
+var wind_indicator;
 var showModel = false;
+var model_indicator;
 var showVisuals = true;
 var showSound = true;
+var sound_indicator;
 var mouse;
 var mouseConstraint;
+
+var settingsPane;
+var settingsPaneToggle;
 
 function preload() {
   imgDeco = loadImage('assets/RoundChimePendant-04.png');
@@ -134,11 +140,20 @@ function setup() {
   mic = new p5.AudioIn();
   mic.start();
 
-   // NOTE: For Testing Value Radomized in windy() for submission
-  // Control Wind for now using Slider
-  windSlider = createSlider(100, 400, 100);
-  windSlider.position(windowWidth - 100, windowHeight-30);
-  windSlider.style('width', '80px');
+  createSettingsPane();
+
+  settingsPaneToggle = createButton('');
+  settingsPaneToggle.style("background","none");
+  settingsPaneToggle.style("border","none");
+  settingsPaneToggle.style("background-image", 'url("assets/settings.png")');
+  settingsPaneToggle.style("background-size", "cover");
+  settingsPaneToggle.style("background-repeat", "no-repeat");
+  settingsPaneToggle.size(20, 20);
+  settingsPaneToggle.position(0+10, windowHeight - settingsPaneToggle.height-10)
+  settingsPaneToggle.mousePressed(function(){
+    settingsPaneToggle.hide();
+    settingsPane.position(0,0);
+  });
 
 }
 
@@ -221,9 +236,7 @@ function drawChimeHanger(x,y,w,h) {
 function windy(){
   // Add wind force to every chime decreasing strength
 
-  var scale = (windSlider.value())/10000;
-
-  var windForce = mic.getLevel()/windSlider.value();
+  var windForce = mic.getLevel()/map(windSlider.value(),100,400,400,100);
 
   Object.keys(chimes).forEach(function(key){
     Body.applyForce(chimes[key].chime,
@@ -245,18 +258,25 @@ function windy(){
 function keyPressed() {
   if (keyCode == 87) {
     startWind = !startWind;
-
-    /* NOTE: For Testing
-    showSlider = !showSlider;
-    showSlider ? windSlider.show() : windSlider.hide();*/
+    if(startWind){
+      wind_indicator.style("background", "#009150");
+    }else{
+      wind_indicator.style("background", "#e60026");
+    }
   }else if (keyCode == 77){
     showModel = !showModel;
-  }else if (keyCode == 86){
-    showModel = showVisuals;
-    showVisuals = !showVisuals;
-  }else if (keyCode == 32){
-    if(showVisuals){
-      showSound = !showSound;
+    showVisuals = !showModel;
+    if(showModel){
+      model_indicator.style("background", "#009150");
+    }else{
+      model_indicator.style("background", "#e60026");
+    }
+  }else if (keyCode == 83){
+    showSound = !showSound;
+    if(showSound){
+      sound_indicator.style("background", "#009150");
+    }else{
+      sound_indicator.style("background", "#e60026");
     }
   }
 }
@@ -382,4 +402,124 @@ function setGradient(x, y, w, h, c1, c2, axis) {
     }
   }
   pop();
+}
+
+
+function createSettingsPane(){
+
+  settingsPane = createDiv('');
+  settingsPane.position(-settingsPane.width,0);
+  settingsPane.style("background", "rgba(33,33,33,.5)");
+  settingsPane.style("padding", "10px");
+  settingsPane.style("font-family", "Helvetica, Arial, sans-serif");
+  settingsPane.style("color", "#FFFFFF");
+  settingsPane.size(windowWidth*.27,windowHeight);
+  settingsPane.style("transition", "all 1s ease");
+
+
+  var closePane = createButton('');
+  closePane.style("background","none");
+  closePane.style("border","none");
+  closePane.style("background-image", 'url("assets/close.png")');
+  closePane.style("background-size", "cover");
+  closePane.style("background-repeat", "no-repeat");
+  closePane.style("float", "right");
+  closePane.size(20,20)
+  closePane.mousePressed(function(){
+    settingsPane.position(-settingsPane.width,0);
+    settingsPaneToggle.show();
+  });
+
+  // Control Wind for now using Slider
+  var wind_p = createP('Wind')
+  wind_p.style("font-weight", "bold");
+
+  /* NOTE: Why am I doing this you might ask? Well p5 Checkboxes have lables
+  that are a seperate element, they are place out side the div and instead of
+  using selectors and moving the lable I'm going to make my own indicators.
+  */
+
+  wind_indicator = createDiv('');
+  wind_indicator.style("background", "#009150");
+  wind_indicator.style("border-radius", "5px");
+  wind_indicator.style("margin-right", "5px");
+  wind_indicator.style("display", "inline-block");
+  wind_indicator.size(10,10);
+
+  wind_button = createButton('Toggle Wind');
+
+  wind_button.mousePressed(function(){
+    startWind = !startWind;
+    if(startWind){
+      wind_indicator.style("background", "#009150");
+    }else{
+      wind_indicator.style("background", "#e60026");
+    }
+  });
+
+  var windStrength_p = createP('Wind Strength')
+  windStrength_p.style("font-weight", "bold");
+  windSlider = createSlider(100, 400, 300);
+  windSlider.style('width', '100%');
+
+  var visual_p = createP('Visuals')
+  visual_p.style("font-weight", "bold");
+
+  model_indicator = createDiv('');
+  model_indicator.style("background", "#e60026");
+  model_indicator.style("border-radius", "5px");
+  model_indicator.style("margin-right", "5px");
+  model_indicator.style("display", "inline-block");
+  model_indicator.size(10,10);
+
+  visual_button = createButton('Show Model');
+  visual_button.mousePressed(function(){
+    showModel = !showModel;
+    showVisuals =!showModel;
+
+    if(showModel){
+      model_indicator.style("background", "#009150");
+    }else{
+      model_indicator.style("background", "#e60026");
+    }
+  });
+
+  var sound_p = createP('Sound');
+  sound_p.style("font-weight", "bold");
+
+  sound_indicator = createDiv('');
+  sound_indicator.style("background", "#009150");
+  sound_indicator.style("border-radius", "5px");
+  sound_indicator.style("margin-right", "5px");
+  sound_indicator.style("display", "inline-block");
+  sound_indicator.size(10,10);
+
+  sound_button = createButton('Toggle Sound');
+  sound_button.mousePressed(function(){
+    showSound = !showSound;
+    if(showSound){
+      sound_indicator.style("background", "#009150");
+    }else{
+      sound_indicator.style("background", "#e60026");
+    }
+  });
+
+
+  settingsPane.child(closePane);
+
+  settingsPane.child(wind_p);
+  settingsPane.child(wind_indicator);
+  settingsPane.child(wind_button);
+
+  settingsPane.child(windStrength_p);
+  settingsPane.child(windSlider);
+
+  settingsPane.child(visual_p);
+  settingsPane.child(model_indicator);
+  settingsPane.child(visual_button);
+
+  settingsPane.child(sound_p);
+  settingsPane.child(sound_indicator);
+  settingsPane.child(sound_button);
+
 }
