@@ -1,7 +1,7 @@
 // A Chime
-
-function Chime(x_pos,y_pos,width,height){
-
+function Chime(x_pos,y_pos,width,height,pitch){
+  this.b1 = color('#AF653B');
+  this.b2 = color('#C5753E');
   this.constraintPos = createVector(x_pos,y_pos);
   this.constraintLen = 100;
   this.w = width;
@@ -10,7 +10,7 @@ function Chime(x_pos,y_pos,width,height){
                           this.constraintPos.y + this.h/2 + this.constraintLen-10);
   this.chimeHue = floor(random(0,360));
   this.sound = false;
-
+  this.chimeSound = pitch;
   this.chimeModel = Composite.create();
 
   this.chime = Bodies.rectangle(this.pos.x, this.pos.y, this.w, this.h);
@@ -19,14 +19,14 @@ function Chime(x_pos,y_pos,width,height){
           bodyB: this.chime,
           pointA: { x: this.constraintPos.x-(this.w/2)-20, y: this.constraintPos.y },
           pointB: { x: -1*(this.w/2), y: -1*((this.h/2)-10) },
-          stiffness: .8,
+          stiffness: .2,
           lenght: this.constraintLen });
 
   this.constraintRight = Constraint.create({
           bodyB: this.chime,
           pointA: { x: this.constraintPos.x+(this.w/2)+20, y: this.constraintPos.y },
           pointB: { x: (this.w/2), y: -1*((this.h/2)-10) },
-          stiffness: .8,
+          stiffness: .2,
           lenght: this.constraintLen });
 
   this.chimeModel = Composite.create();
@@ -87,55 +87,60 @@ function Chime(x_pos,y_pos,width,height){
     translate (-this.w/2,-this.h/2); //LeftCorner of Chime
 
     noStroke();
-    //basic chime body
-    fill("#CB6D23");
+    
+    //basic chime body - top
     beginShape();
-    vertex (-10, -30);
-    vertex (this.w + 10, -30);
-    vertex (this.w + 10, 0);
-    vertex (this.w, 10);
+    setGradient(0, 0, this.w/2, this.h, this.b1, this.b2, X_AXIS);
+    setGradient(this.w/2, 0, this.w/2, this.h, this.b2, this.b1, X_AXIS);
+    vertex (0, 0);
+    vertex (this.w, 0);
     vertex (this.w, this.h);
+    vertex (0, this.h);
+    endShape(CLOSE);
+    
+    // basic chime body - bottom
+    beginShape();
+    fill('#AF653B');
+    vertex (0, this.h+2);
+    vertex (this.w, this.h+2);
     vertex ((this.w -(this.w/4)) , this.h + this.w/4);
     vertex (this.w/4, this.h + this.w/4);
-    vertex (0, this.h);
-    vertex (0, 20);
-    vertex (0, 10);
-    vertex (-10, 0);
     endShape(CLOSE);
-
-    //chime top
+    
+    //chime top lip
     beginShape();
-    fill("#E8A774");
+    setGradient(-10, -30, this.w/2 +10, 30, this.b1, this.b2, X_AXIS);
+    setGradient(this.w/2, -30, this.w/2 +10, 30, this.b2, this.b1, X_AXIS);
     vertex (-10, -30);
     vertex (this.w + 10, -30);
     vertex (this.w + 10, 0);
     vertex (-10, 0);
     endShape(CLOSE);
-
-    //chime top shadow
+    
+    //chime lip shadow
     beginShape();
-    fill("#854E2E");
-    vertex ( -10, 0);
-    vertex (this.w + 10, 0);
+    fill("#703910");
+    vertex ( -10, 2);
+    vertex (this.w + 10, 2);
     vertex (this.w , 10);
     vertex (0, 10);
     endShape(CLOSE);
-
+    
     // chime opening
     beginShape();
     fill('#541E21');
-    vertex (5, (this.h + 30)/2);
+    vertex (7, (this.h + 30)/2);
     bezierVertex(15,
                  (this.h + 30)/2 - this.w/2,
                  this.w -15,
                  (this.h + 30)/2 - this.w/2,
-                 this.w - 5,
+                 this.w - 7,
                  (this.h + 30)/2);
-    vertex (this.w - 5, this.h);
-    vertex ((this.w -(this.w/4)) - 2, this.h + this.w/4);
-    vertex ((this.w/4)+2, this.h + this.w/4);
-    vertex (5, this.h);
-    stroke('#AA5719');
+    vertex (this.w - 7, this.h);
+    vertex ((this.w -(this.w/4)) - 2, this.h + this.w/5);
+    vertex ((this.w/4)+2, this.h + this.w/5);
+    vertex (7, this.h);
+    stroke('#944C16');
     strokeWeight(5);
     endShape(CLOSE);
 

@@ -21,6 +21,9 @@ var windSlider;
 var worldBodies = [];
 
 // Chime Characteristics
+var imgDeco;
+var Y_AXIS = 1;
+var X_AXIS = 2;
 var numberofChimes = 9; // Best if Odd number
 var chimeWidth = 80;
 var spaceAroundChime = chimeWidth + 25;
@@ -29,12 +32,29 @@ var reduceChimeHeight = 25;
 var chimeHangerY = 50;
 var chimeHangerThickness= 30;
 
+// Chime Sounds
+var chimeSound = [];
+
 //For kicks
 /*var showSlider = true; NOTE: For Testing*/
+var mic;
 var startWind = true;
 var showModel = false;
 var showVisuals = true;
 var showSound = true;
+
+function preload() {
+  imgDeco = loadImage('assets/RoundChimePendant-04.png');
+
+  // Load the Chime Sounds
+  chimeSound = [
+    loadSound('assets/chimeSound0.mp3'),
+    loadSound('assets/chimeSound1.mp3'),
+    loadSound('assets/chimeSound2.mp3'),
+    loadSound('assets/chimeSound3.mp3'),
+    loadSound('assets/chimeSound4.mp3')
+  ]
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight); // Use the full browser window
@@ -43,7 +63,7 @@ function setup() {
   engine = Engine.create();
   Events.on(engine, "collisionStart", startSound);
   Events.on(engine, "collisionEnd", endSound);
-
+  var nextSound = 0;
   var startingX = (windowWidth - (numberofChimes * spaceAroundChime))/2 - spaceAroundChime/2;
 
   // Create Chimes
@@ -53,7 +73,7 @@ function setup() {
         var pendulum = new Pendulum(startingX,
                               chimeHangerY,
                               chimeWidth,
-                              largestChimeHeight*1.5 - (reduceChimeHeight*i));
+                              largestChimeHeight*1.65 - (reduceChimeHeight*i));
         pendulums.push(pendulum);
         pendulumModels.push(pendulum.pendulumModel);
       }else{
@@ -61,7 +81,9 @@ function setup() {
         var chime = new Chime(startingX,
                               chimeHangerY+chimeHangerThickness,
                               chimeWidth,
-                              largestChimeHeight - (reduceChimeHeight*i));
+                              largestChimeHeight - (reduceChimeHeight*i),
+                              chimeSound[nextSound]);
+        nextSound++;
         chimes[chime.chime.id] = chime;
         chimeModels.push(chime.chimeModel);
       }
@@ -87,11 +109,14 @@ function setup() {
     clouds.push(c);
   }
 
-  /* NOTE: For Testing Value Radomized in windy() for submission
+  mic = new p5.AudioIn();
+  mic.start();
+
+   // NOTE: For Testing Value Radomized in windy() for submission
   // Control Wind for now using Slider
-  windSlider = createSlider(0, 200, 0);
+  windSlider = createSlider(100, 400, 100);
   windSlider.position(windowWidth - 100, windowHeight-30);
-  windSlider.style('width', '80px');*/
+  windSlider.style('width', '80px');
 
 }
 
@@ -152,8 +177,9 @@ function windy(){
   // Add wind force to every chime decreasing strength
 
   // NOTE:TEMPORARY This will be dictated by user input in the future
-  // (windSlider.value())/10000
-  var windForce = (noise(1,frameCount))/500;
+  var scale = (windSlider.value())/10000;
+
+  var windForce = mic.getLevel()/windSlider.value();
 
   Object.keys(chimes).forEach(function(key){
     Body.applyForce(chimes[key].chime,
@@ -162,9 +188,11 @@ function windy(){
   });
 
   for (i = 0; i< pendulums.length ;i++){
-    Body.applyForce(pendulums[i].pendulum,
-                    {x:0,y:windowHeight-300},
-                    {x:windForce,y:0});
+    var decoration = pendulums[i].bottomDeco;
+
+    Body.applyForce(decoration,
+                    {x:decoration.position.x,y:decoration.position.y},
+                    {x:windForce*.6,y:0});
   }
 }
 
@@ -239,8 +267,10 @@ function startSound(event){
       var pair = pairs[i];
       if(chimes[pair.bodyA.id]){
         chimes[pair.bodyA.id].sound = true;
+        chimes[pair.bodyA.id].chimeSound.play();
       }else if(chimes[pair.bodyB.id]){
         chimes[pair.bodyB.id].sound = true;
+        chimes[pair.bodyB.id].chimeSound.play();
       }
     }
   }
@@ -256,4 +286,40 @@ function endSound(event){
       chimes[pair.bodyB.id].sound = false;
     }
   }
+}
+
+// function mouseClicked() {
+//   for (var i = 0; i < pairs.length; i++) {
+//     if(chimes[pair.bodyA.id]){
+//       chimes[pair.bodyA.id].sound = true;
+//       chimes[pair.bodyA.id].chimeSound.play();
+//     }else if(chimes[pair.bodyB.id]){
+//       chimes[pair.bodyB.id].sound = true;
+//       chimes[pair.bodyB.id].chimeSound.play();
+//     }
+//   }
+// }
+
+function setGradient(x, y, w, h, c1, c2, axis) {
+  noFill();
+  push();
+
+  if (axis == Y_AXIS) {  // Top to bottom gradient
+    for (var i = y; i <= y+h; i++) {
+      var inter = map(i, y, y+h, 0, 1);
+      var c = lerpColor(c1, c2, inter);
+      stroke(c);
+      line(x, i, x+w, i);
+    }
+  }  
+  else if (axis == X_AXIS) {  // Left to right gradient
+    for (var i = x; i <= x+w; i++) {
+      var inter = map(i, x, x+w, 0, 1);
+      var c = lerpColor(c1, c2, inter);
+      stroke(c);
+      strokeWeight(3);
+      line(i, y, i, y+h);
+    }
+  }
+  pop();
 }
