@@ -7,19 +7,6 @@ function Rainbow() {
     this.h = windowHeight;
     this.opacity = 0;
 
-    // this.rainbowFadeIn = function() {
-    //   for (i = 0; i < 50; i++){
-    //     opacity = i/100;
-    //   }
-    // };
-    // this.fade = setInterval(this.rainbowFadeIn, 4000);
-
-    // function rainbowFadeOut(a) {
-    //   for (a = 99; a--){
-    //     a/100;
-    //   }
-    // }
-
     this.show = function(fade){
         // Should we show the rainbow?
         if(fade){
