@@ -19,10 +19,10 @@ var pendulums = [];
 var clouds = [];
 var chimeModels = [];
 var pendulumModels = [];
-var windSlider;
 var worldBodies = [];
 
 // Chime Characteristics
+var imgDecos = [];
 var imgDeco;
 var Y_AXIS = 1;
 var X_AXIS = 2;
@@ -37,11 +37,10 @@ var chimeHangerThickness= 30;
 // Chime Sounds
 var chimeSound = [];
 
-//For kicks
-/*var showSlider = true; NOTE: For Testing*/
 var mic;
 var startWind = true;
 var wind_indicator;
+var windSlider;
 var showModel = false;
 var model_indicator;
 var showVisuals = true;
@@ -49,12 +48,18 @@ var showSound = true;
 var sound_indicator;
 var mouse;
 var mouseConstraint;
+var mouseToPhysics = false;
 
 var settingsPane;
 var settingsPaneToggle;
 
+var introPopup;
+
 function preload() {
-  imgDeco = loadImage('assets/RoundChimePendant-04.png');
+  imgDecos = [ loadImage('assets/RoundChimePendant-01.png'),
+               loadImage('assets/RoundChimePendant-02.png'),
+               loadImage('assets/RoundChimePendant-03.png'),
+               loadImage('assets/RoundChimePendant-04.png')];
 
   // Load the Chime Sounds
   chimeSound = [
@@ -91,6 +96,8 @@ function setup() {
 
   var nextSound = 0;
   var startingX = (windowWidth - (numberofChimes * spaceAroundChime))/2 - spaceAroundChime/2;
+
+  imgDeco = imgDecos[3];
 
   // Create Chimes
   largestChimeHeight = floor(windowHeight*.66);
@@ -140,18 +147,22 @@ function setup() {
   mic = new p5.AudioIn();
   mic.start();
 
+  createIntroPoppup();
+
   createSettingsPane();
 
   settingsPaneToggle = createButton('');
-  settingsPaneToggle.style("background","none");
-  settingsPaneToggle.style("border","none");
-  settingsPaneToggle.style("background-image", 'url("assets/settings.png")');
-  settingsPaneToggle.style("background-size", "cover");
-  settingsPaneToggle.style("background-repeat", "no-repeat");
+  settingsPaneToggle.style("background:none;\
+                            border:none;\
+                            background-image: url('assets/settings.png');\
+                            background-size:cover;\
+                            background-repeat:no-repeat;\
+                            cursor:pointer");
   settingsPaneToggle.size(20, 20);
   settingsPaneToggle.position(0+10, windowHeight - settingsPaneToggle.height-10)
   settingsPaneToggle.mousePressed(function(){
     settingsPaneToggle.hide();
+    mouseToPhysics = false;
     settingsPane.position(0,0);
   });
 
@@ -253,30 +264,28 @@ function windy(){
   }
 }
 
-// For kicks!
-
 function keyPressed() {
   if (keyCode == 87) {
     startWind = !startWind;
     if(startWind){
-      wind_indicator.style("background", "#009150");
+      wind_indicator.style("background", "green");
     }else{
-      wind_indicator.style("background", "#e60026");
+      wind_indicator.style("background", "red");
     }
   }else if (keyCode == 77){
     showModel = !showModel;
     showVisuals = !showModel;
     if(showModel){
-      model_indicator.style("background", "#009150");
+      model_indicator.style("background", "green");
     }else{
-      model_indicator.style("background", "#e60026");
+      model_indicator.style("background", "red");
     }
   }else if (keyCode == 83){
     showSound = !showSound;
     if(showSound){
-      sound_indicator.style("background", "#009150");
+      sound_indicator.style("background", "green");
     }else{
-      sound_indicator.style("background", "#e60026");
+      sound_indicator.style("background", "red");
     }
   }
 }
@@ -361,19 +370,23 @@ function endSound(event){
 }
 
 function mouseDown(event) {
-  var id = event.body.id;
-  var body = chimes[id];
-  if(body){
-    body.sound = true;
-    body.chimeSound.play();
+  if(mouseToPhysics){
+    var id = event.body.id;
+    var body = chimes[id];
+    if(body){
+      body.sound = true;
+      body.chimeSound.play();
+    }
   }
 }
 
 function mouseUp(event) {
-  var id = event.body.id;
-  var body = chimes[id];
-  if(body){
-    body.sound = false;
+  if(mouseToPhysics){
+    var id = event.body.id;
+    var body = chimes[id];
+    if(body){
+      body.sound = false;
+    }
   }
 }
 
@@ -404,105 +417,116 @@ function setGradient(x, y, w, h, c1, c2, axis) {
   pop();
 }
 
-
 function createSettingsPane(){
 
   settingsPane = createDiv('');
-  settingsPane.position(-settingsPane.width,0);
-  settingsPane.style("background", "rgba(33,33,33,.5)");
-  settingsPane.style("padding", "10px");
-  settingsPane.style("font-family", "Helvetica, Arial, sans-serif");
-  settingsPane.style("color", "#FFFFFF");
   settingsPane.size(windowWidth*.27,windowHeight);
-  settingsPane.style("transition", "all 1s ease");
-
+  settingsPane.style("background:rgba(33,33,33,.5);\
+                      color: #FFFFFF; \
+                      padding: 10px; \
+                      transition: all 1s ease; \
+                      font-family: Helvetica, Arial, sans-serif;");
+  settingsPane.position(-settingsPane.width-20,0);
 
   var closePane = createButton('');
-  closePane.style("background","none");
-  closePane.style("border","none");
-  closePane.style("background-image", 'url("assets/close.png")');
-  closePane.style("background-size", "cover");
-  closePane.style("background-repeat", "no-repeat");
-  closePane.style("float", "right");
+  closePane.style("background:none; \
+                   border:none; \
+                   background-image : url('assets/close.png'); \
+                   background-size:cover; \
+                   background-repeat:no-repeat; \
+                   float:right; \
+                   cursor:pointer;");
   closePane.size(20,20)
   closePane.mousePressed(function(){
-    settingsPane.position(-settingsPane.width,0);
+    settingsPane.position(-settingsPane.width-20,0);
+    mouseToPhysics = true;
     settingsPaneToggle.show();
   });
 
   // Control Wind for now using Slider
   var wind_p = createP('Wind')
-  wind_p.style("font-weight", "bold");
 
   /* NOTE: Why am I doing this you might ask? Well p5 Checkboxes have lables
-  that are a seperate element, they are place out side the div and instead of
-  using selectors and moving the lable I'm going to make my own indicators.
+  that are a seperate element. I'm going to make my own indicators.
   */
 
   wind_indicator = createDiv('');
-  wind_indicator.style("background", "#009150");
-  wind_indicator.style("border-radius", "5px");
-  wind_indicator.style("margin-right", "5px");
-  wind_indicator.style("display", "inline-block");
-  wind_indicator.size(10,10);
+  wind_indicator.class("indicator");
+  wind_indicator.style("background", "green");
 
   wind_button = createButton('Toggle Wind');
+  wind_button.class("toggleButton");
 
   wind_button.mousePressed(function(){
     startWind = !startWind;
     if(startWind){
-      wind_indicator.style("background", "#009150");
+      wind_indicator.style("background", "green");
     }else{
-      wind_indicator.style("background", "#e60026");
+      wind_indicator.style("background", "red");
     }
   });
 
   var windStrength_p = createP('Wind Strength')
-  windStrength_p.style("font-weight", "bold");
+
   windSlider = createSlider(100, 400, 300);
   windSlider.style('width', '100%');
+  windSlider.style("cursor","pointer");
 
   var visual_p = createP('Visuals')
-  visual_p.style("font-weight", "bold");
 
   model_indicator = createDiv('');
-  model_indicator.style("background", "#e60026");
-  model_indicator.style("border-radius", "5px");
-  model_indicator.style("margin-right", "5px");
-  model_indicator.style("display", "inline-block");
-  model_indicator.size(10,10);
+  model_indicator.class("indicator");
+  model_indicator.style("background", "red");
+
 
   visual_button = createButton('Show Model');
+  visual_button.class("toggleButton");
+
   visual_button.mousePressed(function(){
     showModel = !showModel;
     showVisuals =!showModel;
 
     if(showModel){
-      model_indicator.style("background", "#009150");
+      model_indicator.style("background", "green");
     }else{
-      model_indicator.style("background", "#e60026");
+      model_indicator.style("background", "red");
     }
   });
 
   var sound_p = createP('Sound');
-  sound_p.style("font-weight", "bold");
 
   sound_indicator = createDiv('');
-  sound_indicator.style("background", "#009150");
-  sound_indicator.style("border-radius", "5px");
-  sound_indicator.style("margin-right", "5px");
-  sound_indicator.style("display", "inline-block");
-  sound_indicator.size(10,10);
+  sound_indicator.class("indicator");
+  sound_indicator.style("background", "green");
 
   sound_button = createButton('Toggle Sound');
+  sound_button.class("toggleButton");
   sound_button.mousePressed(function(){
     showSound = !showSound;
     if(showSound){
-      sound_indicator.style("background", "#009150");
+      sound_indicator.style("background", "green");
     }else{
-      sound_indicator.style("background", "#e60026");
+      sound_indicator.style("background", "red");
     }
   });
+
+  var deco_p = createP('Change Decoration');
+
+  // Deco Change
+  var decoButtonsDiv = createDiv('');
+  decoButtonsDiv.id("decoButtonsDiv")
+
+  for(var i = 0; i<imgDecos.length; i++){
+    var button = createButton('');
+    button.imageIndex = i;
+    button.class("decoButton");
+    index = i+1;
+    button.style("background-image", 'url("assets/RoundChimePendant-0'+ index +'.png")');
+    button.mousePressed(function(){
+      imgDeco = imgDecos[this.imageIndex];
+    });
+    decoButtonsDiv.child(button);
+  }
 
 
   settingsPane.child(closePane);
@@ -522,4 +546,25 @@ function createSettingsPane(){
   settingsPane.child(sound_indicator);
   settingsPane.child(sound_button);
 
+  settingsPane.child(deco_p);
+  settingsPane.child(decoButtonsDiv);
+
+}
+
+
+function createIntroPoppup(){
+   introPopup = createDiv('');
+   introPopup.id("introPopup");
+   introPopup.size(windowWidth/2,windowHeight/2);
+   introPopup.position(windowWidth/2-windowWidth/4,windowHeight/2-windowHeight/4)
+   introPopup.child(createElement('h1','Oto'));
+   introPopup.child(createImg('assets/windBlow.png','Welcome to Oto!'));
+   introPopup.child(createP('Blow or Click on the chimes to make them sound.'));
+   var button = createButton('Begin');
+   button.mousePressed(function(event){
+     introPopup.hide();
+     event.stopPropagation();
+     mouseToPhysics = true;
+   });
+   introPopup.child(button);
 }
