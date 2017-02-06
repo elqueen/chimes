@@ -2,6 +2,110 @@
 body {
   background: #C0D9E8;
 }
-#chimeBody {
-  background: rgba(133,78,46,1);
+
+.toggleButton {
+  cursor: pointer;
+  background: rgba(33,33,33,.5);
+  border: none;
+  color: rgb(255,255,255);
+  font-size: 1em;
+  padding: .5em;
+  border-radius: .5em;
+}
+
+.toggleButton:hover {
+  background: rgba(33,33,33,.6);
+}
+
+.toggleButton:active {
+  background: rgb(33,33,33);
+}
+
+#decoButtonsDiv {
+  display : flex;
+  justify-content : space-around;
+  padding: 5%;
+  background: rgba(255,255,255,.25);
+  border-radius: 5px;
+}
+
+.decoButton {
+  background: none;
+  border: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  display: block;
+  width: 20%;
+  padding-top: 20%;
+  cursor: pointer;
+}
+
+p {
+  font-weight: bold;
+}
+
+#introPopup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  text-align: center;
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding: 5px;
+  color: #999999;
+  box-shadow: 0px 0px 10px rgba(0,0,0,.25);
+}
+
+#introPopup h1{
+  font-family: Helvetica, Arial, sans-serif;
+  color: #39B7CD;
+  margin: 0;
+  font-weight: 100;
+  font-size: 3em;
+}
+
+#introPopup p{
+  font-weight: normal;
+}
+
+#introPopup button {
+  align-self: center;
+  cursor: pointer;
+  background: none;
+  border: 1px solid #39B7CD;
+  color: #39B7CD;
+  font-size: 1em;
+  font-weight: normal;
+  width:30%;
+  padding: .5em;
+  border-radius: .5em;
+}
+
+#introPopup img {
+  align-self: center;
+  width:25%;
+}
+
+#introPopup button:hover {
+  background: #ECECEC;
+}
+
+#introPopup button:active {
+  background: #ACACAC;
+}
+
+*:focus {
+    outline: none;
+}
+
+.indicator {
+  cursor: pointer;
+  border-radius: 5px;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border: 1px solid rgba(33,33,33,.25);
 }
