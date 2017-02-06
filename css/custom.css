@@ -3,6 +3,12 @@ body {
   background: #C0D9E8;
 }
 
+p {
+  font-weight: bold;
+}
+
+/* Toggle Buttons for the Setting Panel */
+
 .toggleButton {
   cursor: pointer;
   background: rgba(33,33,33,.5);
@@ -20,6 +26,8 @@ body {
 .toggleButton:active {
   background: rgb(33,33,33);
 }
+
+/* Buttons for Changing the Decoration Image*/
 
 #decoButtonsDiv {
   display : flex;
@@ -40,9 +48,7 @@ body {
   cursor: pointer;
 }
 
-p {
-  font-weight: bold;
-}
+/* Intro Popup Styling */
 
 #introPopup {
   display: flex;
@@ -96,9 +102,13 @@ p {
   background: #ACACAC;
 }
 
+/* Remove Blue Focus Border YUCK! */
+
 *:focus {
     outline: none;
 }
+
+/* Styling for Indicator on Setting Panel */
 
 .indicator {
   cursor: pointer;
