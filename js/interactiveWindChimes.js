@@ -80,7 +80,7 @@ var startWind = true, // Apply Force
   var birdy;
   var prettyRainbow;
   var showRainbow = false;
-  var a; 
+  var a;
 
 function preload() {
   // Load Different Images for Pendulum bottomDeco
@@ -269,10 +269,8 @@ function draw() {
       clouds.push(c);
     }
 
-    // Draw Rainbow 
-    if(showRainbow){
-      prettyRainbow.show();
-    } 
+    // Draw Rainbow
+    prettyRainbow.show(showRainbow);
 
     // Draw Hanger
     drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
@@ -436,13 +434,14 @@ function mouseUp(event) {
   }
 }
 
-/* 
+/*
  * Rainbow
  */
   function mouseClicked() {
     var d = dist(mouseX, mouseY, windowWidth - 100, 50);
     if (d < 100) {
-      showRainbow = true;
+      // Clicked in Birdy - Toggle On/Off Rainbow!
+      showRainbow = !showRainbow;
     }
   }
 
