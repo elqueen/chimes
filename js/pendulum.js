@@ -4,9 +4,12 @@
  */
 
 function Pendulum(x_pos,y_pos,width,height){
+
     this.pos = createVector(x_pos,y_pos+chimeHangerThickness);
     this.w = width;
     this.h = height;
+
+    /* FOR PHYSICS MODEL */
 
     // The Circle that Hits The Chime
     this.pendulum = Bodies.circle(this.pos.x, this.pos.y + this.h*.3, this.w*.5,{restitution:.5});
@@ -40,6 +43,8 @@ function Pendulum(x_pos,y_pos,width,height){
                                        this.bottomDeco,
                                        this.constraintTop,
                                        this.constraintBottom]);
+
+    /* FOR PHYSICS MODEL --- END*/
 
     this.show = function(){
 
