@@ -1,3 +1,8 @@
+/*
+ *  The Cute little Bird that can summon Rainbows.
+ *  Created by @elqueen
+ */
+
 function Bird(){
   this.x = windowWidth - 100;
   this.y = 30;

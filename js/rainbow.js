@@ -1,3 +1,8 @@
+/*
+ *  The Beautiful Rainbow that appears in the background.
+ *  Created by @elqueen
+ */
+
 function Rainbow() {
     this.startAngle = PI;
     this.endAngle = 0;
