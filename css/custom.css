@@ -53,49 +53,55 @@ p {
 #introPopup {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
   font-family: Helvetica, Arial, sans-serif;
   font-weight: normal;
   text-align: center;
   background: #FFFFFF;
   border-radius: 10px;
-  padding: 5px;
   color: #999999;
   box-shadow: 0px 0px 10px rgba(0,0,0,.25);
 }
 
 #introPopup h1{
   font-family: Helvetica, Arial, sans-serif;
-  color: #39B7CD;
+  color: #C0D9E8;
   margin: 0;
   font-weight: 100;
-  font-size: 3em;
+  font-size: 5em;
+  text-transform: uppercase;
+}
+
+#introPopup h3 {
+  font-weight: 300;
+  color: #C0D9E8;
+  font-size: 1.5em;
 }
 
 #introPopup p{
   font-weight: normal;
+  color: #70949E;
 }
 
 #introPopup button {
   align-self: center;
   cursor: pointer;
   background: none;
-  border: 1px solid #39B7CD;
-  color: #39B7CD;
+  border: 1px solid #F2A844;
+  color: #F2A844;
   font-size: 1em;
   font-weight: normal;
   width:30%;
   padding: .5em;
-  border-radius: .5em;
-}
-
-#introPopup img {
-  align-self: center;
-  width:25%;
+  border-radius: 1em;
+  margin-top: 1em;
+  transition: all 0.3s ease 0s;
 }
 
 #introPopup button:hover {
-  background: #ECECEC;
+  background: #F2A844;
+  border: 1px solid #fff;
+  color: #fff;
 }
 
 #introPopup button:active {

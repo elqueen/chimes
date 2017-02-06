@@ -76,6 +76,12 @@ var startWind = true, // Apply Force
     showVisuals = true, // Show Skin
     showSound = true; // Play Sound and Show SoundParticles
 
+// Bird and Rainbow easter egg
+  var birdy;
+  var prettyRainbow;
+  var showRainbow = false;
+  var a; 
+
 function preload() {
   // Load Different Images for Pendulum bottomDeco
   imgDecos = [ loadImage('assets/RoundChimePendant-01.png'),
@@ -201,6 +207,12 @@ function setup() {
   //Create Button to Toggle Settings Panel
   createSettingsPaneToggle();
 
+  //Create bird
+  birdy = new Bird();
+
+  //Create rainbow
+  prettyRainbow = new Rainbow();
+
   // Start Mic Input
   mic = new p5.AudioIn();
   mic.start();
@@ -257,8 +269,16 @@ function draw() {
       clouds.push(c);
     }
 
+    // Draw Rainbow 
+    if(showRainbow){
+      prettyRainbow.show();
+    } 
+
     // Draw Hanger
     drawChimeHanger(0, chimeHangerY, windowWidth, chimeHangerThickness);
+
+    // Draw Bird shape
+    birdy.show();
 
     // Draw Pretty Chimes by @elqueen
     Object.keys(chimes).forEach(function(key){
@@ -416,6 +436,16 @@ function mouseUp(event) {
   }
 }
 
+/* 
+ * Rainbow
+ */
+  function mouseClicked() {
+    var d = dist(mouseX, mouseY, windowWidth - 100, 50);
+    if (d < 100) {
+      showRainbow = true;
+    }
+  }
+
 /*
  *  Functions used to Create Introduction Popup, Settings Panel, and Settings Panel Toggle
  */
@@ -428,13 +458,13 @@ function createIntroPoppup(){
    introPopup.position(windowWidth/2-windowWidth/4,windowHeight/2-windowHeight/4)
 
    // Add Header
-   introPopup.child(createElement('h1','Oto'));
+   introPopup.child(createElement('h1','Oto 音'));
 
-   // Add Image
-   introPopup.child(createImg('assets/windBlow.png','Welcome to Oto!'));
+   // Add Tagline
+   introPopup.child(createElement('h3', 'Bringing sound and joy to your browser'));
 
    // Add Instruction Text
-   introPopup.child(createP('Blow or Click on the chimes to make them sound.'));
+   introPopup.child(createP('Help the wind make music! Blow into your microphone or click on the chimes.'));
 
    // Add Begin Button
    var button = createButton('Begin');

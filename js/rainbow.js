@@ -5,15 +5,21 @@ function Rainbow() {
     this.y = windowHeight;
     this.w = windowWidth*1.25;
     this.h = windowHeight;
-    this.opacity;
-    var i; 
+    this.opacity = .5;
 
-    this.rainbowFadeIn = function() {
-      for (i = 0; i < 50; i++){
-        opacity = i/100;
-      }
-    };
-    this.fade = setInterval(this.rainbowFadeIn, 4000);
+    // this.rainbowFadeIn = function() {
+    //   for (i = 0; i < 50; i++){
+    //     opacity = i/100;
+    //   }
+    // };
+    // this.fade = setInterval(this.rainbowFadeIn, 4000);
+
+    // function rainbowFadeOut(a) {
+    //   for (a = 99; a--){
+    //     a/100;
+    //   }
+    // }
+
     this.show = function(){
         push();
         beginShape();
@@ -33,12 +39,5 @@ function Rainbow() {
         endShape();
         pop();
     }
-    console.log(i);
-
-// function rainbowFadeOut(a) {
-//   for (a = 99; a--){
-//     a/100;
-//   }
-// }
 };
 
