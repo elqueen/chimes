@@ -50,7 +50,7 @@ function Pendulum(x_pos,y_pos,width,height){
              this.constraintBottom.bodyA.position.y + this.constraintBottom.pointA.y,
              this.constraintBottom.bodyB.position.x + this.constraintBottom.pointB.x,
              this.constraintBottom.bodyB.position.y + this.constraintBottom.pointB.y);
-             
+
         pop();
 
         push();
